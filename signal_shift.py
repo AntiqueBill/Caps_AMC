@@ -13,15 +13,10 @@ def load_data(args):
     with h5py.File(args.data, 'r') as f:
         y_train = np.transpose(np.float64(f['train_y'].value-1))
     
-    with h5py.File(args.data, 'r') as f:
-        x_test = np.transpose(np.float64(f['test_x'].value))
-    
-    with h5py.File(args.data, 'r') as f:
-        y_test = np.transpose(np.float64(f['test_y'].value-1))
-    
     y_train = utils.to_categorical(y_train, args.num_classes)
-    y_test = utils.to_categorical(y_test, args.num_classes)
-    
+
+    print('Data loading finished...')
+    print('Start shifting train set')
     idx_tr = range(len(x_train))
     np.random.shuffle(idx_tr)
     X_train = np.zeros([x_train.shape[0], args.length])
@@ -31,11 +26,22 @@ def load_data(args):
         x_train_0 = shift(x_train[i], shifti[0], args)
         x_train_1 = shift(x_train[idx_tr[i]], shifti[1], args)
         X_train[i] = np.add(aci[0]*x_train_0, aci[1]*x_train_1)
+        
     Y_train1 = np.vstack([y_train.argmax(1), y_train[idx_tr].argmax(1)]).T
+    del x_train
+    print('Eliminating repeat categoteries..')
     X_train = X_train[Y_train1[:,0] != Y_train1[:,1]]
     Y_train1 = Y_train1[Y_train1[:,0] != Y_train1[:,1]]
     Y_train = K.eval(K.one_hot(Y_train1, args.num_classes))
     
+    with h5py.File(args.data, 'r') as f:
+        x_test = np.transpose(np.float64(f['test_x'].value))
+    
+    with h5py.File(args.data, 'r') as f:
+        y_test = np.transpose(np.float64(f['test_y'].value-1))
+    
+    print('Start shifting test set')
+    y_test = utils.to_categorical(y_test, args.num_classes)
     idx_te = range(len(x_test))
     np.random.shuffle(idx_te)
     X_test = np.zeros([x_test.shape[0], args.length])
@@ -46,6 +52,8 @@ def load_data(args):
         x_test_1 = shift(x_test[idx_te[i]], shifti[1], args)
         X_test[i] = np.add(aci[0]*x_test_0, aci[1]*x_test_1)
     Y_test1 = np.vstack([y_test.argmax(1), y_test[idx_te].argmax(1)]).T
+    del y_train
+    print('Eliminating repeat categoteries..')
     X_test = X_test[Y_test1[:,0] != Y_test1[:,1]] 
     Y_test1 = Y_test1[Y_test1[:,0] != Y_test1[:,1]]
     Y_test = K.eval(K.one_hot(Y_test1, args.num_classes))
@@ -66,16 +74,16 @@ def shift(signal, shift, args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Multi-class signal generation.")
-    parser.add_argument('-sd', '--save_data', default='test_shifted10_11.npz',
+    parser.add_argument('-sd', '--save_data', default='test_shifted0_10.npz',
                         help="Name of saved data file")
-    parser.add_argument('-m', '--max_shift', default=1000, type=int,
+    parser.add_argument('-m', '--max_shift', default=500, type=int,
                         help="maximum shift of mnist images before adding them together")
-    parser.add_argument('-l', '--length', default=3000, type=int,
+    parser.add_argument('-l', '--length', default=3500, type=int,
                         help="length of signal")
-    parser.add_argument('-ds', '--data', default='./samples/test10_15.mat',
+    parser.add_argument('-ds', '--data', default='./samples/test0_10.mat',
                         help="maximum shift of mnist images before adding them together")
-    parser.add_argument('-max', '--ac_max', default=1.3)
-    parser.add_argument('-min', '--ac_min', default=0.7)
+    parser.add_argument('-max', '--ac_max', default=1.25)
+    parser.add_argument('-min', '--ac_min', default=0.75)
     parser.add_argument('-n', '--num_classes', default=9)
     args = parser.parse_args()
     print(args)

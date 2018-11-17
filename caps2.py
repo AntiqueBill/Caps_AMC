@@ -78,7 +78,7 @@ def CapsNet(input_shape, n_class, routings):
     masked1 =  Lambda(lambda x: x[:,1,:])(masked)
     
     decoder = models.Sequential(name='decoder')
-    decoder.add(layers.Dense(375, input_dim=args.dim_capsules))
+    decoder.add(layers.Dense(375, input_dim=args.dim_capsule))
     decoder.add(ELU(alpha=0.5))
     decoder.add(layers.Reshape(target_shape=(1,375,1), name='out_recon'))
     
@@ -153,7 +153,7 @@ if __name__ == "__main__":
                         help="The coefficient for the loss of decoder")
     parser.add_argument('-r', '--routings', default=3, type=int,
                         help="Number of iterations used in routing algorithm. should > 0")
-    parser.add_argument('-sf', '--save_file', default='caps2_3000.h5',
+    parser.add_argument('-sf', '--save_file', default='10_11_3000.h5',
                         help="Name of saved weight file")
     parser.add_argument('-t', '--test', default=0,type=int,
                         help="Test only model")
@@ -161,20 +161,51 @@ if __name__ == "__main__":
                         help="load weight file or not")
     parser.add_argument('-p', '--plot', default=1,type=int,
                         help="plot training loss after finished if plot==1")
-    parser.add_argument('-d', '--dataset', default='test_shifted.mat',
+    parser.add_argument('-d', '--dataset', default='test_shifted10_11.npz',
                         help="name of dataset that needs loading")
-    parser.add_argument('-n', '--num_classes', default=7)
+    parser.add_argument('-n', '--num_classes', default=9)
     parser.add_argument('-dc', '--dim_capsule', default=15)
     args = parser.parse_args()
     print(args)
     
     K.set_image_data_format('channels_last')
-    
+    ''' 
     data = sio.loadmat(args.dataset, appendmat=False)
     for i in data:
         locals()[i] = data[i]
     del data
     del i
+    '''
+    
+    with np.load(args.dataset) as data:
+        x_train = data['x_train']
+
+    with np.load(args.dataset) as data:
+        y_train = data['y_train']
+
+    with np.load(args.dataset) as data:    
+        x_test = data['x_test']
+
+    with np.load(args.dataset) as data:
+        y_test = data['y_test']
+
+    with np.load(args.dataset) as data:
+        x_train0 = data['x_train0']
+
+    with np.load(args.dataset) as data:
+        x_train1 = data['x_train1']
+
+    with np.load(args.dataset) as data:
+        x_test0 = data['x_test0']
+
+    with np.load(args.dataset) as data:
+        x_test1 = data['x_test1']
+
+    with np.load(args.dataset) as data:
+        y_train1 = data['y_train1']
+
+    with np.load(args.dataset) as data:
+        y_test1 = data['y_test1']
 
     model, eval_model = CapsNet(input_shape=x_train.shape[1:], n_class=args.num_classes, routings=args.routings)
         
@@ -208,7 +239,7 @@ if __name__ == "__main__":
     y_train1 = np.reshape(y_train1, np.prod(y_train1.shape))
     print('Train acc:', np.sum(y_pred1_tr == y_train1)/np.float(y_train1.shape[0]))
     
-    
+
     y_pred, x_recon0, x_recon1 = eval_model.predict(x_test, batch_size=args.batch_size)
     _, y_pred1 = tf.nn.top_k(y_pred, 2)
     y_pred1 = K.eval(y_pred1)
@@ -218,6 +249,9 @@ if __name__ == "__main__":
     y_test1 = np.reshape(y_test1, np.prod(y_test1.shape))
     print('Test acc:', np.sum(y_pred1 == y_test1)/np.float(y_test1.shape[0]))
     print('-' * 30 + 'End: test' + '-' * 30)   
+
+    
+    
 '''
     from keras.utils import plot_model
     plot_model(model, to_file='model.png',show_shapes = True)
