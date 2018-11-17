@@ -21,53 +21,49 @@ K.set_image_data_format('channels_last')
 def CapsNet(input_shape, n_class, routings):
     x = layers.Input(shape=input_shape)
     conv1 = layers.Conv2D(filters=64, kernel_size=(1,3), strides=(1,2), padding='same')(x)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     conv1 = layers.Conv2D(filters=64, kernel_size=(1,3), strides=(1,1), padding='same')(conv1)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     conv1 = layers.MaxPooling2D((1, 2), strides=(1, 2))(conv1)
     
     conv1 = layers.Conv2D(filters=96, kernel_size=(1,3), strides=1, padding='same')(conv1)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     conv1 = layers.Conv2D(filters=96, kernel_size=(1,3), strides=1, padding='same')(conv1)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     conv1 = layers.MaxPooling2D((1, 2), strides=(1, 2))(conv1)
     
     conv1 = layers.Conv2D(filters=128, kernel_size=(1,3), strides=1, padding='same')(conv1)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     conv1 = layers.Conv2D(filters=128, kernel_size=(1,3), strides=1, padding='same')(conv1)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     conv1 = layers.MaxPooling2D((1, 2), strides=(1, 2))(conv1)
 
     conv1 = layers.Conv2D(filters=192, kernel_size=(1,3), strides=1, padding='same')(conv1)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     conv1 = layers.Conv2D(filters=192, kernel_size=(1,3), strides=1, padding='same')(conv1)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     conv1 = layers.Conv2D(filters=192, kernel_size=(1,3), strides=1, padding='same')(conv1)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     conv1 = layers.MaxPooling2D((1, 2), strides=(1, 2))(conv1)
 
     conv1 = layers.Conv2D(filters=256, kernel_size=(1,3), strides=1, padding='same')(conv1)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     conv1 = layers.Conv2D(filters=256, kernel_size=(1,3), strides=1, padding='same')(conv1)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     conv1 = layers.Conv2D(filters=256, kernel_size=(1,3), strides=1, padding='same')(conv1)
-    #conv1 = ELU(alpha=0.5)(conv1)
-    #conv1 = BN()(conv1)
-
-
-    
-    
+    conv1 = ELU(alpha=0.5)(conv1)
+    conv1 = BN()(conv1)
     
     primarycaps = PrimaryCap(conv1, dim_capsule=8, n_channels=32, kernel_size=(1,3),
                              strides=1, padding='same')
@@ -181,8 +177,7 @@ if __name__ == "__main__":
 
     
     
-'''
+
     from keras.utils import plot_model
     plot_model(model, to_file='model.png',show_shapes = True)
-    plot_model(eval_model, to_file='eval_model.png',show_shapes = True)
-'''
+
